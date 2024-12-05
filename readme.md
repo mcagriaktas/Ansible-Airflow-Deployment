@@ -6,6 +6,8 @@ In this deployment, I used 3 empty Ubuntu containers to simulate a real deployme
 
 In the containers folder, you'll see 3 folders that are mounted as volumes in the containers, so you can easily manage your container scripts and other resources.
 
+<img width="958" alt="image" src="https://github.com/user-attachments/assets/10861f4f-0a13-46a5-ba38-e3a0f5789710">
+
 ## IP Addresses
 - ansible-admin => 172.80.0.10
 - server1 - (airflow webserver) => 172.80.0.11
