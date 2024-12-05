@@ -1,0 +1,31 @@
+---
+- name: Restart Airflow Scheduler Services
+  hosts: all
+  become: yes
+  vars_files:
+    - roles/airflow/vars/main.yml
+  tasks:
+    - name: Stop all Airflow processes
+      shell: |
+        cd {{ airflow_home }} && \
+        pkill -f "airflow.*scheduler" || true
+        pkill -f "gunicorn" || true
+      failed_when: false
+      when: inventory_hostname == 'server2'
+
+    - name: Delete scheduler PID file
+      file:
+        path: "{{ airflow_home }}/airflow-scheduler.pid"
+        state: absent
+      ignore_errors: yes
+      when: inventory_hostname == 'server2'
+
+    - name: Start Airflow scheduler
+      shell: |
+        cd {{ airflow_home }} && \
+        sudo -u {{ airflow_user }} bash -c 'export TZ=UTC && . venv/bin/activate && AIRFLOW_HOME={{ airflow_home }} airflow scheduler -D'
+      when: inventory_hostname == 'server2'
+
+    - name: Wait for scheduler to start
+      wait_for:
+        timeout: 5

@@ -1,0 +1,99 @@
+---
+- name: Create Airflow group
+  become: yes
+  group:
+    name: "{{ airflow_group }}"
+    state: present
+    system: yes
+
+- name: Create Airflow user
+  become: yes
+  user:
+    name: "{{ airflow_user }}"
+    group: "{{ airflow_group }}"
+    home: "{{ airflow_home }}"
+    system: yes
+    createhome: yes
+    shell: /bin/bash
+
+- name: Install Airflow dependencies
+  become: yes
+  apt:
+    name:
+      - python3-pip
+      - python3-dev
+      - python3-venv
+      - libpq-dev
+      - build-essential
+      - postgresql-client
+      - python3-psycopg2
+    state: present
+    update_cache: yes
+
+- name: Create Airflow directory structure
+  become: yes
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ airflow_user }}"
+    group: "{{ airflow_group }}"
+    mode: '0755'
+  with_items:
+    - "{{ airflow_home }}"
+    - "{{ airflow_home }}/venv"
+    - "{{ airflow_home }}/dags"
+    - "{{ airflow_home }}/logs"
+    - "{{ airflow_home }}/plugins"
+
+- name: Set AIRFLOW_HOME in bashrc
+  become: yes
+  lineinfile:
+    path: "{{ airflow_home }}/.bashrc"
+    line: "export AIRFLOW_HOME={{ airflow_home }}"
+    create: yes
+    owner: "{{ airflow_user }}"
+    group: "{{ airflow_group }}"
+
+- name: Create airflow environment file
+  become: yes
+  template:
+    src: airflow.env.j2
+    dest: "/etc/profile.d/airflow.sh"
+    mode: '0644'
+    
+- name: Initialize virtual environment
+  become: yes
+  shell: |
+    cd {{ airflow_home }}
+    python3 -m venv venv
+
+- name: Install Apache Airflow
+  become: yes
+  shell: |
+    cd {{ airflow_home }}
+    . venv/bin/activate
+    pip install apache-airflow=={{ airflow_version }} apache-airflow[postgres] statsd
+
+- name: Configure Airflow
+  become: yes
+  template:
+    src: "{{ 'webserver.cfg.j2' if airflow_service == 'webserver' else 'scheduler.cfg.j2' }}"
+    dest: "{{ airflow_home }}/airflow.cfg"
+    owner: "{{ airflow_user }}"
+    group: "{{ airflow_group }}"
+    mode: '0644'
+
+- name: Create webserver config
+  become: yes
+  template:
+    src: webserver_config.py.j2
+    dest: "{{ airflow_home }}/webserver_config.py"
+    owner: "{{ airflow_user }}"
+    group: "{{ airflow_group }}"
+    mode: '0644'
+
+- name: Set correct permissions
+  become: yes
+  shell: |
+    chown -R {{ airflow_user }}:{{ airflow_group }} {{ airflow_home }}
+    chmod -R 755 {{ airflow_home }}

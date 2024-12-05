@@ -1,0 +1,8 @@
+# playbooks/roles/airflow/vars/main.yml
+---
+airflow_version: "2.10.3"
+airflow_home: "/opt/airflow"
+airflow_user: "airflow"
+airflow_group: "airflow"
+sql_alchemy_conn: postgresql+psycopg2://cagri:3541@172.80.0.13:5432/airflowdb
+secret_key: nZMFdlSn4JNd3a+vI/AuyQ==

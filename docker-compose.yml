@@ -1,0 +1,63 @@
+services:
+  ansible-admin:
+    container_name: ansible-admin
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "2223:22"
+    volumes:
+      - ./containers/ansible-admin:/mnt/ansible
+    networks:
+      dahbest:
+        ipv4_address: 172.80.0.10
+
+  server1:
+    container_name: server1
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVER_USER: "server1"
+        SERVER_PASSWORD: "server1"
+    ports:
+      - "2224:22"
+      - "8080:8080"
+    volumes: 
+      - ./containers/server1:/mnt/server1
+    networks:
+      dahbest:
+        ipv4_address: 172.80.0.11
+
+  server2:
+    container_name: server2
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVER_USER: "server2"
+        SERVER_PASSWORD: "server2"
+    ports:
+      - "2225:22"
+    volumes:
+      - ./containers/server2:/mnt/server2
+    networks:
+      dahbest:
+        ipv4_address: 172.80.0.12
+
+  postgres:
+    image: postgres:17
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=airflowdb
+      - POSTGRES_USER=cagri
+      - POSTGRES_PASSWORD=3541
+    networks:
+      dahbest:
+        ipv4_address: 172.80.0.13
+
+networks:
+  dahbest:
+    external: true

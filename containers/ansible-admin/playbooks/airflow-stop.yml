@@ -1,0 +1,26 @@
+---
+- name: Stop Airflow Services
+  hosts: all
+  become: yes
+  vars_files:
+    - roles/airflow/vars/main.yml
+  tasks:
+    - name: Stop Airflow webserver
+      shell: |
+        cd {{ airflow_home }} && \
+        pkill -f "airflow.*webserver" || true
+        pkill -f "gunicorn" || true
+      ignore_errors: yes
+      when: inventory_hostname == 'server1'
+
+    - name: Stop Airflow scheduler
+      shell: |
+        cd {{ airflow_home }} && \
+        pkill -f "airflow.*scheduler" || true
+        pkill -f "gunicorn" || true
+      ignore_errors: yes
+      when: inventory_hostname == 'server2'
+
+    - name: Wait for processes to stop
+      wait_for:
+        timeout: 5

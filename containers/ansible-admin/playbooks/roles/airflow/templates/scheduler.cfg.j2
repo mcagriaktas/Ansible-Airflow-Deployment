@@ -1,0 +1,36 @@
+[core]
+dags_folder = {{ airflow_home }}/dags
+plugins_folder = {{ airflow_home }}/plugins
+executor = LocalExecutor
+load_examples = True
+default_timezone = UTC
+
+[logging]
+base_log_folder = {{ airflow_home }}/logs
+
+[database]
+sql_alchemy_conn = postgresql+psycopg2://cagri:3541@postgres:5432/airflowdb
+
+[webserver]
+config_file = {{ airflow_home }}/webserver_config.py
+base_url = http://172.80.0.11:8080
+web_server_host = 172.80.0.11
+web_server_port = 8080
+secret_key = {{ secret_key }}
+default_ui_timezone = UTC
+authenticate = True
+auth_backend = airflow.api.auth.backend.basic_auth
+
+[api]
+auth_backends = airflow.api.auth.backend.basic_auth
+
+[metrics]
+statsd_on = True
+
+[scheduler]
+job_heartbeat_sec = 5
+scheduler_heartbeat_sec = 5
+min_file_process_interval = 30
+dag_file_processor_timeout = 600
+scheduler_health_check_threshold = 30
+

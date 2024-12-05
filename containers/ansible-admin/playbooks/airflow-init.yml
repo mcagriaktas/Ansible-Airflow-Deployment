@@ -1,0 +1,26 @@
+---
+- name: Initialize Airflow Database and Create Admin User
+  hosts: all
+  become: yes
+  vars_files:
+    - roles/airflow/vars/main.yml
+  tasks:
+    - name: Initialize Airflow database
+      shell: |
+        cd {{ airflow_home }} && \
+        sudo -u {{ airflow_user }} bash -c '. venv/bin/activate && AIRFLOW_HOME={{ airflow_home }} airflow db init'
+      when: inventory_hostname == 'server1'  # Run only on webserver
+
+    - name: Create Airflow admin user
+      shell: |
+        cd {{ airflow_home }} && \
+        sudo -u {{ airflow_user }} bash -c '. venv/bin/activate && AIRFLOW_HOME={{ airflow_home }} airflow users create \
+          --username admin \
+          --firstname admin \
+          --lastname admin \
+          --role Admin \
+          --email admin@example.com \
+          --password admin'
+      ignore_errors: yes  # In case user already exists
+      when: inventory_hostname == 'server1'  # Run only on webserver
+
