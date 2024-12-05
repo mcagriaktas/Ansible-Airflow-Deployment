@@ -57,6 +57,22 @@ ansible --version
 └── readme.md
 ```
 
+### Configuration Files
+- **hosts.yml**: Ansible inventory file that defines target servers (IPs, usernames, roles) for deployment
+- **tasks/**: Contains the actual commands and actions that roles will execute
+- **templates/**: Holds configuration files with variables using .j2 extension (Jinja2 format)
+- **vars/**: Stores role-specific variables with high priority
+
+### Additional Useful Directories
+
+These aren't used in our current setup but are valuable for larger deployments:
+
+- **files/**: Contains static files to copy without variable processing
+- **handlers/**: Manages service operations (restart/reload triggers)
+- **group_vars/**: Stores variables applied to groups of servers
+- **defaults/**: Contains default variables with lowest priority
+- **meta/**: Defines role metadata and dependencies on other roles
+  
 ## Setup Instructions
 
 ### 1. Configure SSH Access
