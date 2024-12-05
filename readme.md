@@ -75,6 +75,12 @@ These aren't used in our current setup but are valuable for larger deployments:
   
 ## Setup Instructions
 
+### Before Start:
+Create a network for Docker:
+```
+docker network create --subnet=172.80.0.0/16 dahbest
+```
+
 ### 1. Configure SSH Access
 **Note**: You need to run all your Ansible files in the `ansible-admin` container:
 ```bash
